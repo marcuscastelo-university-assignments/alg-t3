@@ -60,17 +60,18 @@ int main(int argc, char const *argv[])
         adiciona(c_primeiro, insercao[i]);
     tempo_insere_primeiro = finaliza_tempo();
 
-    inicia_tempo();
-    c_binaria  = cria_colecao(ARVORE_BINARIA);
-    for (int i = 0; i < N; i++)
-        adiciona(c_binaria, insercao[i]);
-    tempo_insere_binaria = finaliza_tempo();
+    //TODO: uncomment
+    // inicia_tempo();
+    // c_binaria  = cria_colecao(ARVORE_BINARIA);
+    // for (int i = 0; i < N; i++)
+    //     adiciona(c_binaria, insercao[i]);
+    // tempo_insere_binaria = finaliza_tempo();
     
-    inicia_tempo();
-    c_avl = cria_colecao(ARVORE_AVL);
-    for (int i = 0; i < N; i++)
-        adiciona(c_avl, insercao[i]);
-    tempo_insere_avl = finaliza_tempo();
+    // inicia_tempo();
+    // c_avl = cria_colecao(ARVORE_AVL);
+    // for (int i = 0; i < N; i++)
+    //     adiciona(c_avl, insercao[i]);
+    // tempo_insere_avl = finaliza_tempo();
 
 
     // busca os valores nas 5 estruturas
@@ -89,21 +90,23 @@ int main(int argc, char const *argv[])
         encontrado_primeiro += existe(c_primeiro, busca[i]);
     tempo_busca_primeiro = finaliza_tempo();
 
-    inicia_tempo();
-    for (int i = 0; i < N; i++)
-        encontrado_binaria += existe(c_binaria, busca[i]);
-    tempo_busca_binaria = finaliza_tempo();
+    //TODO: uncomment2
+    // inicia_tempo();
+    // for (int i = 0; i < N; i++)
+    //     encontrado_binaria += existe(c_binaria, busca[i]);
+    // tempo_busca_binaria = finaliza_tempo();
     
-    inicia_tempo();
-    for (int i = 0; i < N; i++)
-        encontrado_avl += existe(c_avl, busca[i]);
-    tempo_busca_avl = finaliza_tempo();
+    // inicia_tempo();
+    // for (int i = 0; i < N; i++)
+    //     encontrado_avl += existe(c_avl, busca[i]);
+    // tempo_busca_avl = finaliza_tempo();
 
     destroi(c_ordenado);
     destroi(c_ultimo);
     destroi(c_primeiro);
-    destroi(c_binaria);
-    destroi(c_avl);
+    //TODO: uncomment 3
+    // destroi(c_binaria);
+    // destroi(c_avl);
 
     printf("\nTempo de Inserção\n");
     printf("LISTA_ORDENADO\t%f\n", tempo_insere_ordenado);

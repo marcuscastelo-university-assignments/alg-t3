@@ -36,7 +36,7 @@ No* cria_no(int valor)
 }
 
 void _adiciona_ordenada(Colecao *c, int valor) {
-    if (c->inicio == NULL) {
+    if (c -> inicio == NULL) {
         c -> inicio = cria_no(valor);
         return;
     }
@@ -57,7 +57,8 @@ void _adiciona_ordenada(Colecao *c, int valor) {
     novoNo -> dir = noNavegadorDir;
     novoNo -> esq = noNavegador;
 
-    novoNo -> dir -> esq = novoNo;
+    if (noNavegadorDir != NULL)
+        novoNo -> dir -> esq = novoNo;
     novoNo -> esq -> dir = novoNo;
     #undef noNavegadorDir
 }
@@ -140,19 +141,42 @@ int existe(Colecao* c, int valor)
     }
 }
 
-void _destroi_no_recursivo(No *no) {
+//TODO: checar
+void _destroi_no_recursivo_arvore(No *no) {
     if (no == NULL) return;
 
-    _destroi_no_recursivo(no -> esq);
-    _destroi_no_recursivo(no -> dir);
+    _destroi_no_recursivo_arvore(no -> esq);
+    _destroi_no_recursivo_arvore(no -> dir);
 
     free(no);
 }
 
+
+void _destroi_lista(No *no) {
+    if (no == NULL) return;
+    while (no -> dir != NULL) {
+        no = no -> dir;
+        no -> esq -> dir = NULL;
+        no -> esq -> esq = NULL;
+        free(no -> esq);
+    }
+    no -> esq = NULL;
+    free (no);
+}
 void destroi(Colecao* c)
 {
     if (c == NULL) return;
 
-    _destroi_no_recursivo(c -> inicio);
+    switch (c -> estrutura_id)
+    {
+    case ID_LISTA_ORDENADA:
+    case ID_LISTA_PRIMEIRA:
+    case ID_LISTA_ULTIMA:
+        _destroi_lista(c -> inicio);
+        break;
+    
+    default:
+        break;
+    }
     free(c);
 }
