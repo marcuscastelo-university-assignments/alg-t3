@@ -15,14 +15,20 @@ struct _c {
 
 Colecao* cria_colecao(int estrutura_id) 
 {
-    // Implementar
-    return NULL;
+    Colecao *colecao = (Colecao*) malloc(sizeof(Colecao));
+    colecao -> estrutura_id = estrutura_id;
+    colecao -> inicio = NULL;
+    return colecao;
 }
 
 No* cria_no(int valor)
 {
-    // Implementar
-    return NULL;
+    No *no = (No*) malloc(sizeof(No));
+    no -> valor = valor;
+    no -> altura = 0;
+    no -> dir = NULL;
+    no -> esq = NULL;
+    return no;
 }
 
 void adiciona(Colecao* c, int valor)
@@ -35,7 +41,20 @@ int existe(Colecao* c, int valor)
     // Implementar
     return 1;
 }
+
+void _destroi_no_recursivo(No *no) {
+    if (no == NULL) return;
+
+    _destroi_no_recursivo(no -> esq);
+    _destroi_no_recursivo(no -> dir);
+
+    free(no);
+}
+
 void destroi(Colecao* c)
 {
-    // Implementar
+    if (c == NULL) return;
+
+    _destroi_no_recursivo(c -> inicio);
+    free(c);
 }
