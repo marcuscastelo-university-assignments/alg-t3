@@ -59,33 +59,85 @@ void _adiciona_ordenada(Colecao *c, int valor) {
 
     novoNo -> dir -> esq = novoNo;
     novoNo -> esq -> dir = novoNo;
+    #undef noNavegadorDir
 }
 
 void _adiciona_inicio(Colecao *c, int valor) {
+    if (c->inicio == NULL) {
+        c->inicio = cria_no(valor);
+        return;
+    }
 
+    c -> inicio -> esq = cria_no(valor);
+    c -> inicio -> esq -> dir = c -> inicio;
+    c -> inicio = c -> inicio -> esq;
 }
 
 void _adiciona_fim(Colecao *c, int valor) {
+    if (c -> inicio == NULL) {
+        c -> inicio = cria_no(valor);
+        return;
+    }
 
+    No *fim = c -> inicio;
+    while (fim -> dir != NULL) fim = fim->dir;
+    fim -> dir = cria_no(valor);
+    fim -> dir -> esq = fim;
 }
 
 void adiciona(Colecao* c, int valor)
 {
     switch (c -> estrutura_id)
     {
-    case ID_LISTA_ORDENADA:
-        _adiciona_ordenada(c, valor);
-        break;
-    
-    default:
-        break;
+        case ID_LISTA_ORDENADA:
+            _adiciona_ordenada(c, valor);
+            break;
+        case ID_LISTA_PRIMEIRA:
+            _adiciona_inicio(c, valor);
+            break;
+        case ID_LISTA_ULTIMA:
+            _adiciona_fim(c,valor);
+            break;
+        case ID_ABB: //TODO: implementar adiciona_abb
+            break;
+        case ID_AVL: //TODO: implementar adiciona_avl
+            break;
     }
 }
 
+int _existe_ordenada(Colecao *c, int valor) {
+    No *noNavegador = c->inicio;
+    while (noNavegador != NULL && noNavegador -> valor < valor) noNavegador = noNavegador -> dir;
+    if (noNavegador != NULL && noNavegador -> valor == valor) return 1;
+    return 0; 
+}
+
+int _existe_desordenada(Colecao *c, int valor) {
+    No *noNavegador = c->inicio;
+    while (noNavegador != NULL) {
+        if (noNavegador -> valor == valor) return 1;
+        noNavegador = noNavegador -> dir;
+    } 
+    return 0;
+}
+
+
 int existe(Colecao* c, int valor)
 {
-    // Implementar
-    return 1;
+    switch (c->estrutura_id)
+    {
+        case ID_LISTA_ORDENADA:
+            return _existe_ordenada(c, valor);
+        case ID_LISTA_PRIMEIRA:
+        case ID_LISTA_ULTIMA:
+            return _existe_desordenada(c, valor);
+        case ID_ABB:
+            return 0; //TODO: implementar existe_abb
+        case ID_AVL:
+            return 0; //TODO: implementar existe_avl
+        default:
+            return 0;
+    }
 }
 
 void _destroi_no_recursivo(No *no) {
