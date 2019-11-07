@@ -10,7 +10,7 @@ struct _no {
     struct _no* esq;
     struct _no* dir;
     int altura;
-} ;
+};
 
 struct _c {
     No* inicio;
@@ -86,6 +86,42 @@ void _adiciona_fim(Colecao *c, int valor) {
     fim -> dir -> esq = fim;
 }
 
+void _adiciona_abb(Colecao * c, int valor) {
+    if (c->inicio == NULL) {
+        c->inicio = cria_no(valor);
+        return;
+    }
+
+    percorre_e_adiciona_abb(c->inicio, valor);
+
+    return;
+}
+
+void percorre_e_adiciona_abb(No * noAtual, int valor) {
+    if (valor > noAtual->valor) { // será inserido no filho a direita (ABB)!
+        if (noAtual->dir == NULL) {
+            noAtual->dir = cria_no(valor);
+            noAtual->dir->altura = noAtual->altura + 1;
+            return;
+        }
+        else {
+            percorre_e_adiciona_abb(noAtual->dir, valor); // chama a função recursiva, "entrando" no filho à direita
+        }
+    }
+    else { // valor <= noAtual->valor --- será inserido no filho a esquerda (ABB)!
+        if (noAtual->esq == NULL) {
+            noAtual->esq = cria_no(valor);
+            noAtual->esq->altura = noAtual->altura + 1;
+            return;
+        }
+        else {
+            percorre_e_adiciona_abb(noAtual->esq, valor); // chama a função recursiva, "entrando" no filho à esquerda
+        }
+    }
+
+    return;
+}
+
 void adiciona(Colecao* c, int valor)
 {
     switch (c -> estrutura_id)
@@ -99,7 +135,8 @@ void adiciona(Colecao* c, int valor)
         case ID_LISTA_ULTIMA:
             _adiciona_fim(c,valor);
             break;
-        case ID_ABB: //TODO: implementar adiciona_abb
+        case ID_ABB:
+            _adiciona_abb(c, valor);
             break;
         case ID_AVL: //TODO: implementar adiciona_avl
             break;
@@ -122,6 +159,24 @@ int _existe_desordenada(Colecao *c, int valor) {
     return 0;
 }
 
+int existe_abb(Colecao * c, int valor) {
+    if (c == NULL) return 0; // não existe, pois a coleção não está definida
+    if (c->inicio == NULL) return 0; // não existe, pois a raiz não está definida (não há árvore)
+
+    return existe_recursiva_abb(c->inicio, valor);
+}
+
+int existe_recursiva_abb(No * noAtual, int valor) {
+    if (noAtual == NULL) return 0; // valor não encotrado
+
+    if (noAtual->valor == valor) return 1; // valor encontrado
+
+    if (noAtual->valor > valor)
+        return existe_recursiva_abb(noAtual->dir, valor);
+    else // noAtual->valor <= valor
+        return existe_recursiva_abb(noAtual->esq, valor);
+}
+
 
 int existe(Colecao* c, int valor)
 {
@@ -133,7 +188,8 @@ int existe(Colecao* c, int valor)
         case ID_LISTA_ULTIMA:
             return _existe_desordenada(c, valor);
         case ID_ABB:
-            return 0; //TODO: implementar existe_abb
+            existe_abb(c, valor);
+            return 0;
         case ID_AVL:
             return 0; //TODO: implementar existe_avl
         default:
@@ -141,14 +197,15 @@ int existe(Colecao* c, int valor)
     }
 }
 
-//TODO: checar
-void _destroi_no_recursivo_arvore(No *no) {
+void _destroi_no_recursivo_arvore(No * no) {
     if (no == NULL) return;
 
-    _destroi_no_recursivo_arvore(no -> esq);
-    _destroi_no_recursivo_arvore(no -> dir);
+    _destroi_no_recursivo_arvore(no->esq);
+    _destroi_no_recursivo_arvore(no->dir);
 
     free(no);
+
+    return;
 }
 
 
@@ -174,6 +231,9 @@ void destroi(Colecao* c)
     case ID_LISTA_ULTIMA:
         _destroi_lista(c -> inicio);
         break;
+    case ID_ABB:
+         _destroi_no_recursivo_arvore(c->inicio);
+         break;
     
     default:
         break;
