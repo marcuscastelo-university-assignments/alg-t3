@@ -102,8 +102,8 @@ int main(int argc, char const *argv[])
     destroi(c_ordenado);
     destroi(c_ultimo);
     destroi(c_primeiro);
+    destroi(c_binaria);
     //TODO: uncomment 3
-    // destroi(c_binaria);
     // destroi(c_avl);
 
     printf("\nTempo de Inserção\n");
