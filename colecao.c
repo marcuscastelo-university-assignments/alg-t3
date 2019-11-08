@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "colecao.h"
 
+//TODO: comment subroutine functions (starting by _)
 
 /**
  * 
@@ -168,18 +169,7 @@ int _existe_desordenada(Colecao *c, int valor) {
 #pragma endregion
 #pragma region Arvore Binaria de Busca (ABB)
 
-void _adiciona_abb(Colecao * c, int valor) {
-    if (c->inicio == NULL) {
-        c->inicio = cria_no(valor);
-        return;
-    }
-
-    percorre_e_adiciona_abb(c->inicio, valor);
-
-    return;
-}
-
-void percorre_e_adiciona_abb(No * noAtual, int valor) {
+void _adiciona_abb_recursiva(No * noAtual, int valor) {
     if (valor > noAtual->valor) { // será inserido no filho a direita (ABB)!
         if (noAtual->dir == NULL) {
             noAtual->dir = cria_no(valor);
@@ -187,7 +177,7 @@ void percorre_e_adiciona_abb(No * noAtual, int valor) {
             return;
         }
         else {
-            percorre_e_adiciona_abb(noAtual->dir, valor); // chama a função recursiva, "entrando" no filho à direita
+            _adiciona_abb_recursiva(noAtual->dir, valor); // chama a função recursiva, "entrando" no filho à direita
         }
     }
     else { // valor <= noAtual->valor --- será inserido no filho a esquerda (ABB)!
@@ -197,30 +187,45 @@ void percorre_e_adiciona_abb(No * noAtual, int valor) {
             return;
         }
         else {
-            percorre_e_adiciona_abb(noAtual->esq, valor); // chama a função recursiva, "entrando" no filho à esquerda
+            _adiciona_abb_recursiva(noAtual->esq, valor); // chama a função recursiva, "entrando" no filho à esquerda
         }
     }
 
     return;
 }
 
-int existe_abb(Colecao * c, int valor) {
-    if (c == NULL) return 0; // não existe, pois a coleção não está definida
-    if (c->inicio == NULL) return 0; // não existe, pois a raiz não está definida (não há árvore)
+void _adiciona_abb(Colecao * c, int valor) {
+    if (c->inicio == NULL) {
+        c->inicio = cria_no(valor);
+        return;
+    }
 
-    return existe_recursiva_abb(c->inicio, valor);
+    _adiciona_abb_recursiva(c->inicio, valor);
+
+    return;
 }
 
-int existe_recursiva_abb(No * noAtual, int valor) {
+
+
+int _existe_abb_recursiva(No * noAtual, int valor) {
     if (noAtual == NULL) return 0; // valor não encotrado
 
     if (noAtual->valor == valor) return 1; // valor encontrado
 
     if (noAtual->valor > valor)
-        return existe_recursiva_abb(noAtual->dir, valor);
+        return _existe_abb_recursiva(noAtual->dir, valor);
     else // noAtual->valor <= valor
-        return existe_recursiva_abb(noAtual->esq, valor);
+        return _existe_abb_recursiva(noAtual->esq, valor);
 }
+
+int existe_abb(Colecao * c, int valor) {
+    if (c == NULL) return 0; // não existe, pois a coleção não está definida
+    if (c->inicio == NULL) return 0; // não existe, pois a raiz não está definida (não há árvore)
+
+    return _existe_abb_recursiva(c->inicio, valor);
+}
+
+
 
 #pragma endregion
 
@@ -291,11 +296,11 @@ int existe(Colecao* c, int valor)
  *********************************/
 
 #pragma region Arvores (ABB e AVL)
-void _destroi_no_recursivo_arvore(No * no) {
+void _destroi_no_arvore_recursiva(No * no) {
     if (no == NULL) return;
 
-    _destroi_no_recursivo_arvore(no->esq);
-    _destroi_no_recursivo_arvore(no->dir);
+    _destroi_no_arvore_recursiva(no->esq);
+    _destroi_no_arvore_recursiva(no->dir);
 
     free(no);
 
@@ -338,7 +343,7 @@ void destroi(Colecao* c)
             _destroi_lista(c -> inicio);
             break;
         case ID_ABB:
-            _destroi_no_recursivo_arvore(c->inicio);
+            _destroi_no_arvore_recursiva(c->inicio);
             break;
         
         default:
