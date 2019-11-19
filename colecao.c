@@ -86,23 +86,62 @@ void _adiciona_fim(Colecao *c, int valor) {
     fim -> dir -> esq = fim;
 }
 
-void _adiciona_abb(Colecao * c, int valor) {
-    if (c->inicio == NULL) {
-        c->inicio = cria_no(valor);
-        return;
-    }
+// funções auxiliares para rotação (AVL):
+No * rotacao_direita(No * a) {
+    No * b = a->esq;
+    a->esq = b->dir;
+    b->dir = a;
 
-    percorre_e_adiciona_abb(c->inicio, valor);
+    a->altura = 1 + ((a->esq->altura > a->dir->altura) ? a->esq->altura : a->dir->altura);
+    b->altura = 1 + ((b->esq->altura > a->altura) ? b->esq->altura : a->altura);
 
-    return;
+    return b;
 }
 
-void percorre_e_adiciona_abb(No * noAtual, int valor) {
+No * rotacao_esquerda(No * a) {
+    No * b = a->dir;
+    a->dir = b->esq;
+    b->esq = a;
+
+    a->altura = 1 + ((a->esq->altura > a->dir->altura) ? a->esq->altura : a->dir->altura);
+    b->altura = 1 + ((b->dir->altura > a->altura) ? b->dir->altura : a->altura);
+
+    return b;
+}
+
+No * rotacao_esquerda_direita(No * a) {
+    a->esq = rotacao_esquerda(a->esq);
+    return rotacao_direita(a);
+}
+
+No * rotacao_direita_esquerda(No * a) {
+    a->dir = rotacao_direita(a->esq);
+    return rotacao_esquerda(a);
+}
+
+No * _adiciona_abb_avl(Colecao * c, int valor, int id) {
+    if (c->inicio == NULL) {
+        c->inicio = cria_no(valor);
+        return NULL;
+    }
+
+    return percorre_e_adiciona_abb_avl(c->inicio, valor, id);
+}
+
+No * percorre_e_adiciona_abb_avl(No * noAtual, int valor, int id) {
     if (valor > noAtual->valor) { // será inserido no filho a direita (ABB)!
         if (noAtual->dir == NULL) {
             noAtual->dir = cria_no(valor);
             noAtual->dir->altura = noAtual->altura + 1;
-            return;
+
+            if (id == ID_AVL) {
+                if (noAtual->esq->altura - noAtual->dir->altura == -2) { // árvore desbalanceada
+                    if (valor > noAtual->dir->valor)
+                        rotacao_esquerda(noAtual);
+                    else
+                        rotacao_direita_esquerda(noAtual);
+                }
+            }
         }
         else {
             percorre_e_adiciona_abb(noAtual->dir, valor); // chama a função recursiva, "entrando" no filho à direita
@@ -112,14 +151,24 @@ void percorre_e_adiciona_abb(No * noAtual, int valor) {
         if (noAtual->esq == NULL) {
             noAtual->esq = cria_no(valor);
             noAtual->esq->altura = noAtual->altura + 1;
-            return;
+
+            if (id == ID_AVL) {
+                if (noAtual->esq->altura - noAtual->dir->altura == 2) { // árvore desbalanceada
+                    if (valor < noAtual->esq->valor)
+                        rotacao_direita(noAtual);
+                    else
+                        rotacao_esquerda_direita(noAtual);
+                }
+            }
         }
         else {
-            percorre_e_adiciona_abb(noAtual->esq, valor); // chama a função recursiva, "entrando" no filho à esquerda
+            percorre_e_adiciona_abb_avl(noAtual->esq, valor); // chama a função recursiva, "entrando" no filho à esquerda
         }
     }
 
-    return;
+    noAtual->altura = 1 + (noAtual->esq->altura > noAtual->dir->altura) ? noAtual->esq->altura : noAtual->dir->altura;
+
+    return noAtual;
 }
 
 void adiciona(Colecao* c, int valor)
@@ -136,9 +185,8 @@ void adiciona(Colecao* c, int valor)
             _adiciona_fim(c,valor);
             break;
         case ID_ABB:
-            _adiciona_abb(c, valor);
-            break;
-        case ID_AVL: //TODO: implementar adiciona_avl
+        case ID_AVL:
+            _adiciona_abb_avl(c, valor, c->estrutura_id);
             break;
     }
 }
@@ -159,22 +207,22 @@ int _existe_desordenada(Colecao *c, int valor) {
     return 0;
 }
 
-int existe_abb(Colecao * c, int valor) {
+int existe_abb_avl(Colecao * c, int valor) {
     if (c == NULL) return 0; // não existe, pois a coleção não está definida
     if (c->inicio == NULL) return 0; // não existe, pois a raiz não está definida (não há árvore)
 
-    return existe_recursiva_abb(c->inicio, valor);
+    return existe_recursiva_abb_avl(c->inicio, valor);
 }
 
-int existe_recursiva_abb(No * noAtual, int valor) {
+int existe_recursiva_abb_avl(No * noAtual, int valor) {
     if (noAtual == NULL) return 0; // valor não encotrado
 
     if (noAtual->valor == valor) return 1; // valor encontrado
 
     if (noAtual->valor > valor)
-        return existe_recursiva_abb(noAtual->dir, valor);
+        return existe_recursiva_abb_avl(noAtual->dir, valor);
     else // noAtual->valor <= valor
-        return existe_recursiva_abb(noAtual->esq, valor);
+        return existe_recursiva_abb_avl(noAtual->esq, valor);
 }
 
 
@@ -188,10 +236,9 @@ int existe(Colecao* c, int valor)
         case ID_LISTA_ULTIMA:
             return _existe_desordenada(c, valor);
         case ID_ABB:
-            existe_abb(c, valor);
-            return 0;
         case ID_AVL:
-            return 0; //TODO: implementar existe_avl
+            existe_abb_avl(c, valor);
+            return 0;
         default:
             return 0;
     }
@@ -232,9 +279,9 @@ void destroi(Colecao* c)
         _destroi_lista(c -> inicio);
         break;
     case ID_ABB:
+    case ID_AVL:
          _destroi_no_recursivo_arvore(c->inicio);
          break;
-    
     default:
         break;
     }
