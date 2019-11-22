@@ -1,8 +1,6 @@
 #include <stdlib.h>
 #include "colecao.h"
 
-#include <stdio.h>
-
 //TODO: comment subroutine functions (starting by _)
 
 /**
@@ -25,6 +23,11 @@
 typedef enum {
     ID_LISTA_ORDENADA = 1, ID_LISTA_ULTIMA, ID_LISTA_PRIMEIRA, ID_ABB, ID_AVL
 } ESTRUTURA_ID;
+
+/**
+ * Definindo uma função que retorna o maior valor dentre dois
+ */
+#define max(a, b) ((a > b) ? a : b)
 
 /**
  *  Struct privada (Tipo incompleto público)
@@ -85,10 +88,14 @@ Colecao* cria_colecao(int estrutura_id)
 No* cria_no(int valor)
 {
     No *no = (No*) malloc(sizeof(No));
+
+    if (no == NULL) return NULL;
+
     no -> valor = valor;
     no -> altura = 0;
     no -> dir = NULL;
     no -> esq = NULL;
+
     return no;
 }
 
@@ -171,120 +178,127 @@ int _existe_desordenada(Colecao *c, int valor) {
 
 #pragma endregion
 
-#pragma region Arvore Binaria de Busca (ABB) e AVL
+#pragma region Arvore Binaria de Busca (ABB)
 
-// funções auxiliares para rotação (AVL):
-No * rotacao_direita(No * a) {
+No * _adiciona_abb_recursiva(No * noAtual, int valor) {
+    if (noAtual == NULL) return cria_no(valor); 
+  
+    if (valor < noAtual->valor) 
+        noAtual->esq  = _adiciona_abb_recursiva(noAtual->esq, valor); 
+    else if (valor > noAtual->valor) 
+        noAtual->dir = _adiciona_abb_recursiva(noAtual->dir, valor);    
+  
+    return noAtual; 
+}
+
+void _adiciona_abb(Colecao * c, int valor) {
+    if (c == NULL) return;
+    if (c->inicio == NULL) return;
+
+    _adiciona_abb_recursiva(c->inicio, valor);
+}
+
+int _existe_abb_recursiva(No * noAtual, int valorProcurado) {
+    if (noAtual->valor == valorProcurado) return 1; // valor encontrado (1 = verdadeiro)
+
+    if (valorProcurado < noAtual->valor) {
+        if (noAtual->esq != NULL)
+            return _existe_abb_recursiva(noAtual->esq, valorProcurado);
+    }
+    else {
+        if (noAtual->dir != NULL)
+            return _existe_abb_recursiva(noAtual->dir, valorProcurado);
+    }
+
+    return 0;
+}
+
+int _existe_abb(Colecao * c, int valor) {
+    if (c == NULL) return 0;
+    if (c->inicio == NULL) return 0;
+
+    _existe_abb_recursiva(c->inicio, valor);
+}
+
+#pragma endregion
+
+#pragma region AVL
+
+// Funções auxiliares (de rotação)
+No * rotacao_direita(No *a) {
     No * b = a->esq;
+
     a->esq = b->dir;
     b->dir = a;
 
-    a->altura = 1 + ((a->esq->altura > a->dir->altura) ? a->esq->altura : a->dir->altura);
-    b->altura = 1 + ((b->esq->altura > a->altura) ? b->esq->altura : a->altura);
+    a->altura = max(avl_altura_no(a->esq), avl_altura_no(a->dir)) + 1;
+    b->altura = max(avl_altura_no(b->esq), a->altura) + 1;
 
     return b;
 }
 
 No * rotacao_esquerda(No * a) {
     No * b = a->dir;
+
     a->dir = b->esq;
     b->esq = a;
 
-    a->altura = 1 + ((a->esq->altura > a->dir->altura) ? a->esq->altura : a->dir->altura);
-    b->altura = 1 + ((b->dir->altura > a->altura) ? b->dir->altura : a->altura);
+    a->altura = max(avl_altura_no(a->esq), avl_altura_no(a->dir)) + 1;
+    b->altura = max(avl_altura_no(b->dir), a->altura) + 1;
 
     return b;
 }
 
-No * rotacao_esquerda_direita(No * a) {
-    a->esq = rotacao_esquerda(a->esq);
-    return rotacao_direita(a);
+No * rodatacao_esquerda_direita(No * a) {
+    a->esq = rodar_esquerda(a->esq);
+
+    return rodar_direita(a);
 }
 
-No * rotacao_direita_esquerda(No * a) {
-    a->dir = rotacao_direita(a->esq);
-    return rotacao_esquerda(a);
+No * rodatacao_direita_esquerda(No * a) {
+    a->dir = rodar_direita(a->dir);
+    
+    return rodar_esquerda(a);
 }
 
-No * percorre_e_adiciona_abb_avl(No * noAtual, int valor, int id) {
-    printf("Comparing %d to %d\n", valor, noAtual->valor);
-    if (valor > noAtual->valor) { // será inserido no filho a direita (ABB)!
-        printf("%d is bigger!\n", valor);
-        if (noAtual->dir == NULL) {
-            noAtual->dir = cria_no(valor);
-            noAtual->dir->altura = noAtual->altura + 1;
-            printf("New node (right): Value = %d and height = %d\n", noAtual->dir->valor, noAtual->dir->altura);
+No * _adiciona_avl_recursiva(No * noAtual, int valor) {
+    if (noAtual == NULL) return cria_no(valor);
+  
+    if (valor < noAtual->valor) 
+        noAtual->esq  = _adiciona_avl_recursiva(noAtual->esq, valor); 
+    else if (valor > noAtual->valor) 
+        noAtual->dir = _adiciona_avl_recursiva(noAtual->dir, valor);    
+  
+    return noAtual; 
+}
 
-            if (id == ID_AVL) {
-                printf("AVL! [right]\n");
-                if (noAtual->esq->altura - noAtual->dir->altura == -2) { // árvore desbalanceada
-                    if (valor > noAtual->dir->valor)
-                        rotacao_esquerda(noAtual);
-                    else
-                        rotacao_direita_esquerda(noAtual);
-                }
-            }
-        }
-        else {
-            printf("Going inside right child -> %d\n", noAtual->dir->valor);
-            percorre_e_adiciona_abb_avl(noAtual->dir, valor, id); // chama a função recursiva, "entrando" no filho à direita
-        }
+void _adiciona_avl(Colecao * c, int valor) {
+    if (c == NULL) return;
+    if (c->inicio == NULL) return;
+
+    _adiciona_avl_recursiva(c->inicio, valor);
+}
+
+int _existe_avl_recursiva(No * noAtual, int valorProcurado) {
+    if (noAtual->valor == valorProcurado) return 1; // valor encontrado (1 = verdadeiro)
+
+    if (valorProcurado < noAtual->valor) {
+        if (noAtual->esq != NULL)
+            return _existe_avl_recursiva(noAtual->esq, valorProcurado);
     }
-    else { // valor <= noAtual->valor --- será inserido no filho a esquerda (ABB)!
-        printf("%d is smaller!\n", valor);
-        if (noAtual->esq == NULL) {
-            noAtual->esq = cria_no(valor);
-            noAtual->esq->altura = noAtual->altura + 1;
-            printf("New node (left): Value = %d and height = %d\n", noAtual->esq->valor, noAtual->esq->altura);
-
-            if (id == ID_AVL) {
-                printf("AVL! [left]\n");
-                if (noAtual->esq->altura - noAtual->dir->altura == 2) { // árvore desbalanceada
-                    if (valor < noAtual->esq->valor)
-                        rotacao_direita(noAtual);
-                    else
-                        rotacao_esquerda_direita(noAtual);
-                }
-            }
-        }
-        else {
-            printf("Going inside left child -> %d\n", noAtual->esq->valor);
-            percorre_e_adiciona_abb_avl(noAtual->esq, valor, id); // chama a função recursiva, "entrando" no filho à esquerda
-        }
+    else {
+        if (noAtual->dir != NULL)
+            return _existe_avl_recursiva(noAtual->dir, valorProcurado);
     }
 
-    noAtual->altura = 1 + (noAtual->esq->altura > noAtual->dir->altura) ? noAtual->esq->altura : noAtual->dir->altura;
-
-    return noAtual;
+    return 0;
 }
 
-No * _adiciona_abb_avl(Colecao * c, int valor, int id) {
-    if (c->inicio == NULL) {
-        c->inicio = cria_no(valor);
-        printf("Root of BT created\n");
-        return c->inicio;
-    }
+int _existe_avl(Colecao * c, int valor) {
+    if (c == NULL) return 0;
+    if (c->inicio == NULL) return 0;
 
-    printf("Calling recursion\n");
-    return percorre_e_adiciona_abb_avl(c->inicio, valor, id);
-}
-
-int existe_recursiva_abb_avl(No * noAtual, int valor) {
-    if (noAtual == NULL) return 0; // valor não encotrado
-
-    if (noAtual->valor == valor) return 1; // valor encontrado
-
-    if (noAtual->valor > valor)
-        return existe_recursiva_abb_avl(noAtual->dir, valor);
-    else // noAtual->valor <= valor
-        return existe_recursiva_abb_avl(noAtual->esq, valor);
-}
-
-int existe_abb_avl(Colecao * c, int valor) {
-    if (c == NULL) return 0; // não existe, pois a coleção não está definida
-    if (c->inicio == NULL) return 0; // não existe, pois a raiz não está definida (não há árvore)
-
-    return existe_recursiva_abb_avl(c->inicio, valor);
+    _existe_avl_recursiva(c->inicio, valor);
 }
 
 #pragma endregion
@@ -313,8 +327,10 @@ void adiciona(Colecao* c, int valor)
             _adiciona_fim(c,valor);
             break;
         case ID_ABB:
-        case ID_AVL:
-            _adiciona_abb_avl(c, valor, c->estrutura_id);
+            _adiciona_abb(c, valor);
+            break;
+        // case ID_AVL:
+            // _adiciona_avl(c, valor);
             break;
     }
 }
@@ -341,8 +357,9 @@ int existe(Colecao* c, int valor)
         case ID_LISTA_ULTIMA:
             return _existe_desordenada(c, valor);
         case ID_ABB:
-        case ID_AVL:
-            return existe_abb_avl(c, valor);
+            return _existe_abb(c, valor);
+        // case ID_AVL:
+            // return _existe_avl(c, valor);
         default:
             return 0;
     }
