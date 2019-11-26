@@ -217,7 +217,7 @@ int _existe_abb(Colecao * c, int valor) {
     if (c == NULL) return 0;
     if (c->inicio == NULL) return 0;
 
-    _existe_abb_recursiva(c->inicio, valor);
+    return _existe_abb_recursiva(c->inicio, valor);
 }
 
 #pragma endregion
@@ -231,8 +231,8 @@ No * rotacao_direita(No *a) {
     a->esq = b->dir;
     b->dir = a;
 
-    a->altura = max(avl_altura_no(a->esq), avl_altura_no(a->dir)) + 1;
-    b->altura = max(avl_altura_no(b->esq), a->altura) + 1;
+    a->altura = max(a->esq->altura, a->dir->altura) + 1;
+    b->altura = max(b->esq->altura, a->altura) + 1;
 
     return b;
 }
@@ -243,31 +243,49 @@ No * rotacao_esquerda(No * a) {
     a->dir = b->esq;
     b->esq = a;
 
-    a->altura = max(avl_altura_no(a->esq), avl_altura_no(a->dir)) + 1;
-    b->altura = max(avl_altura_no(b->dir), a->altura) + 1;
+    a->altura = max(a->esq->altura, a->dir->altura) + 1;
+    b->altura = max(b->dir->altura, a->altura) + 1;
 
     return b;
 }
 
 No * rodatacao_esquerda_direita(No * a) {
-    a->esq = rodar_esquerda(a->esq);
+    a->esq = rotacao_esquerda(a->esq);
 
-    return rodar_direita(a);
+    return rotacao_direita(a);
 }
 
 No * rodatacao_direita_esquerda(No * a) {
-    a->dir = rodar_direita(a->dir);
+    a->dir = rotacao_direita(a->dir);
     
-    return rodar_esquerda(a);
+    return rotacao_esquerda(a);
 }
 
 No * _adiciona_avl_recursiva(No * noAtual, int valor) {
     if (noAtual == NULL) return cria_no(valor);
   
-    if (valor < noAtual->valor) 
-        noAtual->esq  = _adiciona_avl_recursiva(noAtual->esq, valor); 
-    else if (valor > noAtual->valor) 
-        noAtual->dir = _adiciona_avl_recursiva(noAtual->dir, valor);    
+    if (valor < noAtual->valor) {
+        noAtual->esq  = _adiciona_avl_recursiva(noAtual->esq, valor);
+
+        if (noAtual->esq->altura - noAtual->dir->altura == 2) {
+            if (valor < noAtual->esq->valor)
+            noAtual = rotacao_direita(noAtual);
+        else 
+            noAtual = rodatacao_esquerda_direita(noAtual); 
+        }
+    }
+    else if (valor > noAtual->valor) {
+        noAtual->dir = _adiciona_avl_recursiva(noAtual->dir, valor);   
+
+        if (noAtual->esq->altura - noAtual->dir->altura == -2) {
+            if (valor > noAtual->dir->valor)
+                noAtual = rotacao_esquerda(noAtual);
+            else
+                noAtual = rodatacao_direita_esquerda(noAtual);
+        }
+    }
+    
+    noAtual->altura = max(noAtual->esq->altura, noAtual->dir->altura) + 1;
   
     return noAtual; 
 }
@@ -298,7 +316,7 @@ int _existe_avl(Colecao * c, int valor) {
     if (c == NULL) return 0;
     if (c->inicio == NULL) return 0;
 
-    _existe_avl_recursiva(c->inicio, valor);
+    return _existe_avl_recursiva(c->inicio, valor);
 }
 
 #pragma endregion
@@ -329,8 +347,8 @@ void adiciona(Colecao* c, int valor)
         case ID_ABB:
             _adiciona_abb(c, valor);
             break;
-        // case ID_AVL:
-            // _adiciona_avl(c, valor);
+        case ID_AVL:
+            _adiciona_avl(c, valor);
             break;
     }
 }
@@ -358,8 +376,8 @@ int existe(Colecao* c, int valor)
             return _existe_desordenada(c, valor);
         case ID_ABB:
             return _existe_abb(c, valor);
-        // case ID_AVL:
-            // return _existe_avl(c, valor);
+        case ID_AVL:
+            return _existe_avl(c, valor);
         default:
             return 0;
     }

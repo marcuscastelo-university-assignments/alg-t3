@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "auxiliar.h"
 #include "colecao.h"
 
@@ -74,13 +75,13 @@ int main(int argc, char const *argv[])
     tempo_insere_binaria = finaliza_tempo();
     printf("DONE\n");
     
-    // printf("Inserting into AVL...\n");
-    // inicia_tempo();
-    // c_avl = cria_colecao(ARVORE_AVL);
-    // for (int i = 0; i < N; i++)
-    //     adiciona(c_avl, insercao[i]);
-    // tempo_insere_avl = finaliza_tempo();
-    // printf("DONE\n");
+    printf("Inserting into AVL...\n");
+    inicia_tempo();
+    c_avl = cria_colecao(ARVORE_AVL);
+    for (int i = 0; i < N; i++)
+        adiciona(c_avl, insercao[i]);
+    tempo_insere_avl = finaliza_tempo();
+    printf("DONE\n");
 
 
     // busca os valores nas 5 estruturas
@@ -104,17 +105,16 @@ int main(int argc, char const *argv[])
         encontrado_binaria += existe(c_binaria, busca[i]);
     tempo_busca_binaria = finaliza_tempo();
     
-    // inicia_tempo();
-    // for (int i = 0; i < N; i++)
-    //     encontrado_avl += existe(c_avl, busca[i]);
-    // tempo_busca_avl = finaliza_tempo();
+    inicia_tempo();
+    for (int i = 0; i < N; i++)
+        encontrado_avl += existe(c_avl, busca[i]);
+    tempo_busca_avl = finaliza_tempo();
 
     destroi(c_ordenado);
     destroi(c_ultimo);
     destroi(c_primeiro);
     destroi(c_binaria);
-    //TODO: uncomment 3
-    // destroi(c_avl);
+    destroi(c_avl);
 
     printf("\nTempo de Inserção\n");
     printf("LISTA_ORDENADO\t%f\n", tempo_insere_ordenado);
@@ -130,6 +130,9 @@ int main(int argc, char const *argv[])
     printf("LISTA_PRIMEIRO\t%f\t%d\n", tempo_busca_primeiro, encontrado_primeiro);
     printf("ARVORE_BINARIA\t%f\t%d\n", tempo_busca_binaria,  encontrado_binaria);
     printf("ARVORE_AVL    \t%f\t%d\n", tempo_busca_avl,      encontrado_avl);
+
+    free(insercao);
+    free(busca);
 
     return 0;
 }
