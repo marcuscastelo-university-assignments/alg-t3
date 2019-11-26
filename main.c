@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdlib.h> // é necessário dar free em "* insercao" e "* busca"!
 #include "auxiliar.h"
 #include "colecao.h"
 
@@ -99,6 +99,7 @@ int main(int argc, char const *argv[])
     for (int i = 0; i < N; i++)
         encontrado_primeiro += existe(c_primeiro, busca[i]);
     tempo_busca_primeiro = finaliza_tempo();
+
 
     inicia_tempo();
     for (int i = 0; i < N; i++)
