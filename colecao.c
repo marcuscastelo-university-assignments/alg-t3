@@ -69,8 +69,8 @@ struct _c {
 Colecao* cria_colecao(int estrutura_id) 
 {
     Colecao *colecao = (Colecao*) malloc(sizeof(Colecao));
-    colecao -> estrutura_id = estrutura_id;
-    colecao -> inicio = NULL;
+    colecao->estrutura_id = estrutura_id;
+    colecao->inicio = NULL;
     return colecao;
 }
 
@@ -193,9 +193,10 @@ No * _adiciona_abb_recursiva(No * noAtual, int valor) {
 
 void _adiciona_abb(Colecao * c, int valor) {
     if (c == NULL) return;
-    if (c->inicio == NULL) return;
-
-    _adiciona_abb_recursiva(c->inicio, valor);
+    if (c->inicio == NULL)
+        c->inicio = cria_no(valor);
+    else  
+        _adiciona_abb_recursiva(c->inicio, valor);
 }
 
 int _existe_abb_recursiva(No * noAtual, int valorProcurado) {
@@ -225,76 +226,100 @@ int _existe_abb(Colecao * c, int valor) {
 #pragma region AVL
 
 // Funções auxiliares (de rotação)
-No * rotacao_direita(No *a) {
+No * rotacao_direita(Colecao * c, No *a) {
     No * b = a->esq;
+    int alturaEsqA, alturaDirA, alturaEsqB;
+
+    if (c->inicio == a)
+        c->inicio = a->esq;
 
     a->esq = b->dir;
     b->dir = a;
 
-    a->altura = max(a->esq->altura, a->dir->altura) + 1;
-    b->altura = max(b->esq->altura, a->altura) + 1;
+    alturaEsqA = (a->esq != NULL) ? a->esq->altura : -1;
+    alturaDirA = (a->dir != NULL) ? a->dir->altura : -1;
+    alturaEsqB = (b->esq != NULL) ? b->esq->altura : -1;
+
+    a->altura = max(alturaEsqA, alturaDirA) + 1;
+    b->altura = max(alturaEsqB, a->altura) + 1;
 
     return b;
 }
 
-No * rotacao_esquerda(No * a) {
+No * rotacao_esquerda(Colecao * c, No * a) {
     No * b = a->dir;
+    int alturaDirA, alturaEsqA, alturaDirB;
+
+    if (c->inicio == a)
+        c->inicio = a->dir;
 
     a->dir = b->esq;
     b->esq = a;
+    
+    alturaDirA = (a->dir != NULL) ? a->dir->altura : -1;
+    alturaEsqA = (a->esq != NULL) ? a->esq->altura : -1;
+    alturaDirB = (b->dir != NULL) ? b->dir->altura : -1;
 
-    a->altura = max(a->esq->altura, a->dir->altura) + 1;
-    b->altura = max(b->dir->altura, a->altura) + 1;
+    a->altura = max(alturaEsqA, alturaDirA) + 1;
+    b->altura = max(alturaDirB, a->altura) + 1;
 
     return b;
 }
 
-No * rodatacao_esquerda_direita(No * a) {
-    a->esq = rotacao_esquerda(a->esq);
+No * rodatacao_esquerda_direita(Colecao * c, No * a) {
+    a->esq = rotacao_esquerda(c, a->esq);
 
-    return rotacao_direita(a);
+    return rotacao_direita(c, a);
 }
 
-No * rodatacao_direita_esquerda(No * a) {
-    a->dir = rotacao_direita(a->dir);
+No * rodatacao_direita_esquerda(Colecao * c, No * a) {
+    a->dir = rotacao_direita(c, a->dir);
     
-    return rotacao_esquerda(a);
+    return rotacao_esquerda(c, a);
 }
 
-No * _adiciona_avl_recursiva(No * noAtual, int valor) {
+No * _adiciona_avl_recursiva(Colecao * c, No * noAtual, int valor) {
+    int alturaEsq, alturaDir;
+    
     if (noAtual == NULL) return cria_no(valor);
   
     if (valor < noAtual->valor) {
-        noAtual->esq  = _adiciona_avl_recursiva(noAtual->esq, valor);
+        noAtual->esq  = _adiciona_avl_recursiva(c, noAtual->esq, valor);
 
-        if (noAtual->esq->altura - noAtual->dir->altura == 2) {
+        alturaEsq = (noAtual->esq != NULL) ? noAtual->esq->altura : -1;
+        alturaDir = (noAtual->dir != NULL) ? noAtual->dir->altura : -1;
+        if (alturaEsq - alturaDir == 2) {
             if (valor < noAtual->esq->valor)
-            noAtual = rotacao_direita(noAtual);
-        else 
-            noAtual = rodatacao_esquerda_direita(noAtual); 
+                noAtual = rotacao_direita(c, noAtual);
+            else 
+                noAtual = rodatacao_esquerda_direita(c, noAtual); 
         }
     }
     else if (valor > noAtual->valor) {
-        noAtual->dir = _adiciona_avl_recursiva(noAtual->dir, valor);   
+        noAtual->dir = _adiciona_avl_recursiva(c, noAtual->dir, valor);   
 
-        if (noAtual->esq->altura - noAtual->dir->altura == -2) {
+        alturaEsq = (noAtual->esq != NULL) ? noAtual->esq->altura : -1;
+        alturaDir = (noAtual->dir != NULL) ? noAtual->dir->altura : -1;
+        if (alturaEsq - alturaDir == -2) {
             if (valor > noAtual->dir->valor)
-                noAtual = rotacao_esquerda(noAtual);
+                noAtual = rotacao_esquerda(c, noAtual);
             else
-                noAtual = rodatacao_direita_esquerda(noAtual);
+                noAtual = rodatacao_direita_esquerda(c, noAtual);
         }
     }
     
-    noAtual->altura = max(noAtual->esq->altura, noAtual->dir->altura) + 1;
+    noAtual->altura = max(alturaEsq, alturaDir) + 1;
   
     return noAtual; 
 }
 
 void _adiciona_avl(Colecao * c, int valor) {
     if (c == NULL) return;
-    if (c->inicio == NULL) return;
 
-    _adiciona_avl_recursiva(c->inicio, valor);
+    if (c->inicio == NULL)
+        c->inicio = cria_no(valor);
+    else
+        _adiciona_avl_recursiva(c, c->inicio, valor);
 }
 
 int _existe_avl_recursiva(No * noAtual, int valorProcurado) {
