@@ -39,7 +39,7 @@ Não, apesar de haver uma pequena diferença no tempo de busca, a distribuição
 melhora o tempo de busca em relação ao tipo 4 ? Justifique sua resposta.
 
 R.: 
-Sim, mas a melhora é bem pequena, pois essa sequência específica dos valores de entrada faz com que a árvore binária de busca tenha uma boa distribuição (equilibrada) de valores para suas subárvores direita e esquerda em cada nó, ou seja, a ABB aproxima-se de uma AVL (árvore balanceada). Assim, o algoritmo de busca da ABB irá aproximar-se de O(log n), mas isso ainda não é garantido, pois a diferença entre alturas dos subárvores direita e esquerda poderá ser mais do que um em algum nó. A estrutura 5 (AVL) garante exatamente isso (subárbores direta e esquerda com diferença de altura = 1). Consequentemente, seu algoritmo de busca será O(log n) em qualquer caso.
+Sim, mas a melhora é bem pequena, pois essa sequência específica dos valores de entrada faz com que a árvore binária de busca tenha uma boa distribuição (equilibrada) de valores para suas subárvores direita e esquerda em cada nó, ou seja, a ABB aproxima-se de uma AVL (árvore balanceada). Assim, o algoritmo de busca da ABB irá aproximar-se de O(log n), mas isso ainda não é garantido, pois a diferença entre as alturas das subárvores direita e esquerda poderá ser mais do que 1 em algum nó. A estrutura 5 (AVL) garante exatamente isso (subárvores direta e esquerda com diferença de altura = 1). Consequentemente, seu algoritmo de busca será O(log n) em qualquer caso.
 Caso a sequência de entradas fosse outra, a complexidade da busca de ABB poderia aproximar-se de O(n), enquanto a a busca na AVL continuaria O(log n).
 
 ======================================================================================================================
