@@ -16,9 +16,11 @@ A estrutura que possui maior tempo de inserção é a lista ordenada (1). Era de
 3. Como os valores de entrada fornecidos para este projeto influenciam no tempo de
 busca em estruturas baseadas em listas? A ordem dos valores inseridos e buscados
 importa? O tamanho dos valores importa? A quantidade de valores importa?
-R.: Primeiramente, vale ressaltar que quanto menor a quantidade de valores inseridos, mais rápido será o programa - tanto para inserir quanto para buscar valores - independentemente da estrutura baseada em lista utilizada. Além disso, o tamanho das entrada deve respeitar o limite inferior e superior suportado pelo tipo de dado utilizado na lista (nesse projeto: o tamanho de um inteiro).
-Tendo isso em vista, para as listas com inserção desordenada (no início e no fim), os valores de entrada não infuenciam em praticamente nada, pois a inserção é sempre efetuada em um local pré-definido (começo ou fim da lista) e a busca sempre passa por todos os itens da lista. Logo, a complexidade dos algoritmos de busca e de inserção permanece inalterada independentemente dos valores de entrada. A única mudança que poderia ocorrer é: a presença de itens de mesmo valor faria com que a complexidade da busca diminuísse significativamente, pois o valor buscado logo seria encontrado devido à repetição de valores na lista.
-Para a lista ordenada, os valores de entrada influenciam, principalmente, no algoritmo de inserção. A inserção é feita de forma ordenada, ou seja, o novo valor é inserido antes de primeiro valor maior que ele (após o maior valor menor que o novo item). Sendo assim, conforme a sequência dos valores de entrada aproxima-se de uma sequência decrescente, o algoritmo de busca aproxima-se da complexidade O(1), pois os novos valores são inseridos próximos do ínicio da lista (quando um valor na lista é maior que o novo, este já é inserido - só percorremos uma pequena parte da lista para então inserir).
+
+R.:
+Primeiramente, vale ressaltar que quanto menor a quantidade de valores inseridos, mais rápido será o programa - tanto para inserir quanto para buscar valores - independentemente da estrutura baseada em lista utilizada. Além disso, o tamanho das entrada deve respeitar o limite inferior e superior suportado pelo tipo de dado utilizado na lista (nesse projeto: o tamanho de um inteiro).
+Tendo isso em vista, para as listas com inserção desordenada (no início e no fim), os valores de entrada não infuenciam em praticamente nada, pois a inserção é sempre efetuada em um local pré-definido (começo ou fim da lista) e a busca sempre passa por todos os itens da lista, no pior caso. Logo, a complexidade dos algoritmos de busca e de inserção permanece inalterada independentemente dos valores de entrada. A única mudança que poderia ocorrer é: a presença de muitos itens de mesmo valor faria com que a complexidade da busca diminuísse significativamente, pois o valor buscado logo seria encontrado devido à repetição de valores na lista.
+Para a lista ordenada, os valores de entrada influenciam, principalmente, no algoritmo de inserção. A inserção é feita de forma ordenada, ou seja, o novo valor é inserido antes de primeiro valor maior que ele (após o maior valor menor que o novo item). Sendo assim, conforme a sequência dos valores de entrada aproxima-se de uma sequência decrescente, o algoritmo de busca aproxima-se da complexidade O(1), pois os novos valores são inseridos próximos do ínicio da lista (quando um valor na lista é maior que o novo, este já é inserido - só percorremos uma pequena parte da lista para então inserir). Já no caso dos dados serem já próximos a uma lista ordenada crescente, a complexidade se aproxima de O(n), pois no pior caso, que os dados já estão ordenados crescentemente, cada inserção percorerrá a lista inteira para inserir no fim.
 
 ======================================================================================================================
 
@@ -27,7 +29,7 @@ baseadas em árvore? Justifique sua resposta.
 
 R.:
 
-Não, a distribuição dos dados inseridos não caiu nos casos debenerados que a árvore se torna uma lista, mantendo a ABB próxima o suficiente de uma árvore balanceada (o que a AVL faz forçadamente, justificando o maior tempo de inserção nela).
+Não, pois a distribuição dos dados inseridos não caiu nos casos degenerados em que a árvore se tornaria uma lista. Com os dados providos, a ABB se manteve próxima o suficiente de uma árvore balanceada (o que a AVL faz forçadamente, justificando o maior tempo de inserção nela).
 
 ======================================================================================================================
 
