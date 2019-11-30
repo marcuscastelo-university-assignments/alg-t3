@@ -1,6 +1,5 @@
 all: main.o auxiliar.o colecao.o
 	gcc main.o auxiliar.o colecao.o -o programa
-	rm *.o
 main.o: main.c
 	gcc main.c -c
 auxiliar.o: auxiliar.c

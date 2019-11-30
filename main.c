@@ -42,46 +42,36 @@ int main(int argc, char const *argv[])
     int* busca = le_inteiros("busca.txt", N);
     tempo_leitura = finaliza_tempo();
 
-    printf("Inserting into ordered list...\n");
     // insere os valores nas 5 estruturas
     inicia_tempo();
     c_ordenado = cria_colecao(LISTA_ORDENADO);
     for (int i = 0; i < N; i++) 
         adiciona(c_ordenado, insercao[i]);
     tempo_insere_ordenado = finaliza_tempo();
-    printf("DONE\n");
-
-    printf("Inserting into unordered list (last)...\n");
+    
     inicia_tempo();
     c_ultimo  = cria_colecao(LISTA_ULTIMO);
     for (int i = 0; i < N; i++)
         adiciona(c_ultimo, insercao[i]);
     tempo_insere_ultimo = finaliza_tempo();
-    printf("DONE\n");
-
-    printf("Inserting into unordered list (first)...\n");
+    
     inicia_tempo();
     c_primeiro = cria_colecao(LISTA_PRIMEIRO);
     for (int i = 0; i < N; i++)
         adiciona(c_primeiro, insercao[i]);
     tempo_insere_primeiro = finaliza_tempo();
-    printf("DONE\n");
 
-    printf("Inserting into binary search tree...\n");
     inicia_tempo();
     c_binaria  = cria_colecao(ARVORE_BINARIA);
     for (int i = 0; i < N; i++)
         adiciona(c_binaria, insercao[i]);
     tempo_insere_binaria = finaliza_tempo();
-    printf("DONE\n");
     
-    printf("Inserting into AVL...\n");
     inicia_tempo();
     c_avl = cria_colecao(ARVORE_AVL);
     for (int i = 0; i < N; i++)
         adiciona(c_avl, insercao[i]);
     tempo_insere_avl = finaliza_tempo();
-    printf("DONE\n");
 
 
     // busca os valores nas 5 estruturas
@@ -99,7 +89,6 @@ int main(int argc, char const *argv[])
     for (int i = 0; i < N; i++)
         encontrado_primeiro += existe(c_primeiro, busca[i]);
     tempo_busca_primeiro = finaliza_tempo();
-
 
     inicia_tempo();
     for (int i = 0; i < N; i++)

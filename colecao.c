@@ -1,8 +1,6 @@
 #include <stdlib.h>
 #include "colecao.h"
 
-//TODO: comment subroutine functions (starting by _)
-
 /**
  * 
  *  IMPLEMENTAÇÃO DA BIBLIOTECA COLEÇÃO (Estruturas: Lista desordenada, Lista ordenada, Árvore Binária de Busca, AVL)
@@ -105,6 +103,7 @@ No* cria_no(int valor)
  ************************************/
 #pragma region Lista Ordenada
 
+//Função responsável por inserir um valor na lista ordenada
 void _adiciona_ordenada(Colecao *c, int valor) {
     if (c -> inicio == NULL) {
         c -> inicio = cria_no(valor);
@@ -133,6 +132,7 @@ void _adiciona_ordenada(Colecao *c, int valor) {
     #undef noNavegadorDir
 }
 
+//Função que verifica a existência de um valor na lista ordenada
 int _existe_ordenada(Colecao *c, int valor) {
     No *noNavegador = c->inicio;
     while (noNavegador != NULL && noNavegador -> valor < valor) noNavegador = noNavegador -> dir;
@@ -144,6 +144,7 @@ int _existe_ordenada(Colecao *c, int valor) {
 
 #pragma region Lista Desordenada (Inicio e Fim)
 
+//Função que adiciona um valor na lista com inserção no início
 void _adiciona_inicio(Colecao *c, int valor) {
     if (c->inicio == NULL) {
         c->inicio = cria_no(valor);
@@ -155,6 +156,7 @@ void _adiciona_inicio(Colecao *c, int valor) {
     c -> inicio = c -> inicio -> esq;
 }
 
+//Função que adiciona um valor na lista com inserção no fim
 void _adiciona_fim(Colecao *c, int valor) {
     if (c -> inicio == NULL) {
         c -> inicio = cria_no(valor);
@@ -167,6 +169,7 @@ void _adiciona_fim(Colecao *c, int valor) {
     fim -> dir -> esq = fim;
 }
 
+//Função que verifica a existência de um valor nas listas de inserção no início e fim (desordenadas)
 int _existe_desordenada(Colecao *c, int valor) {
     No *noNavegador = c->inicio;
     while (noNavegador != NULL) {
@@ -180,6 +183,7 @@ int _existe_desordenada(Colecao *c, int valor) {
 
 #pragma region Arvore Binaria de Busca (ABB)
 
+//Função recursiva de inserção na ABB (chamada pela função abaixo)
 No * _adiciona_abb_recursiva(No * noAtual, int valor) {
     if (noAtual == NULL) return cria_no(valor); 
   
@@ -191,6 +195,7 @@ No * _adiciona_abb_recursiva(No * noAtual, int valor) {
     return noAtual; 
 }
 
+//Função que serve de ponte entre a função de inserção genérica (fim do arquivo) e a função de inserção recursiva (_adiciona_abb_recursiva)
 void _adiciona_abb(Colecao * c, int valor) {
     if (c == NULL) return;
     if (c->inicio == NULL)
@@ -199,6 +204,7 @@ void _adiciona_abb(Colecao * c, int valor) {
         _adiciona_abb_recursiva(c->inicio, valor);
 }
 
+//Função que busca recursivamente um valor na ABB, retornando 1 se encontrado e 0 se não encontrado
 int _existe_abb_recursiva(No * noAtual, int valorProcurado) {
     if (noAtual->valor == valorProcurado) return 1; // valor encontrado (1 = verdadeiro)
 
@@ -214,6 +220,7 @@ int _existe_abb_recursiva(No * noAtual, int valorProcurado) {
     return 0;
 }
 
+//Função que serve de ponte entre a função de busca genérica (fim do arquivo) e a função de busca recursiva (_existe_abb_recursiva)
 int _existe_abb(Colecao * c, int valor) {
     if (c == NULL) return 0;
     if (c->inicio == NULL) return 0;
@@ -278,6 +285,7 @@ No * rodatacao_direita_esquerda(Colecao * c, No * a) {
     return rotacao_esquerda(c, a);
 }
 
+//Função de adição recursiva na AVL
 No * _adiciona_avl_recursiva(Colecao * c, No * noAtual, int valor) {
     int alturaEsq, alturaDir;
     
@@ -313,6 +321,7 @@ No * _adiciona_avl_recursiva(Colecao * c, No * noAtual, int valor) {
     return noAtual; 
 }
 
+//Função ponte para função recursiva
 void _adiciona_avl(Colecao * c, int valor) {
     if (c == NULL) return;
 
@@ -322,6 +331,7 @@ void _adiciona_avl(Colecao * c, int valor) {
         _adiciona_avl_recursiva(c, c->inicio, valor);
 }
 
+//Função que busca recursivamente um valor na AVL
 int _existe_avl_recursiva(No * noAtual, int valorProcurado) {
     if (noAtual->valor == valorProcurado) return 1; // valor encontrado (1 = verdadeiro)
 
@@ -337,6 +347,7 @@ int _existe_avl_recursiva(No * noAtual, int valorProcurado) {
     return 0;
 }
 
+//Função ponte para a recursiva
 int _existe_avl(Colecao * c, int valor) {
     if (c == NULL) return 0;
     if (c->inicio == NULL) return 0;
